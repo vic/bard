@@ -4,6 +4,25 @@ defmodule Bard.Render do
       import Bard.Render.DSL
     end
   end
+
+  def render({module, props}, bard) do
+    props |> module.render(bard) |> encode(bard)
+  end
+
+  defp encode({tag, props}, bard) when is_atom(tag) and is_map(props) do
+    %{"component" => tag, "props" => encode(props, bard)}
+  end
+
+  defp encode(map, bard) when is_map(map) do
+    Enum.map(map, fn {k, v} -> {encode(k, bard), encode(v, bard)} end) |> Enum.into(%{})
+  end
+
+  defp encode(list, bard) when is_list(list) do
+    Enum.map(list, &encode(&1, bard))
+  end
+
+  defp encode(value, bard), do: value
+
 end
 
 defmodule Bard.Render.Quoted do

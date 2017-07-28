@@ -1,5 +1,3 @@
-import {Socket} from 'phoenix'
-
 import React from 'react'
 import * as Semantic from 'semantic-ui-react'
 import Bard from 'bard'
@@ -8,27 +6,23 @@ import {
   withProps
 } from 'recompose'
 
-const Text = 'span'
-const Title = withProps({size: 'huge'})(Semantic.Header)
-
-const adapted = {
-  Text,
-  Title,
+const universal = {
+  Text: 'span',
+  View: 'div',
+  Title: withProps({size: 'huge'})(Semantic.Header),
 }
 
 const components = {
   'Elixir.BardDemo.SemanticComponents': Semantic,
-  'Elixir.BardDemo.PortableComponents': name => adapted[name] || portable(name),
+  'Elixir.BardDemo.UniversalComponents': name => universal[name] || universe(name),
   'Elixir.BardDemo.WebComponents': name => web(name)
 }
 
-const WS_URI = 'ws://localhost:4000/socket'
-const socket = new Socket(WS_URI)
+const bard = Bard({app: 'demo', components, uri: 'ws://localhost:4000/socket'})
+const web = bard('Elixir.BardDemo.WebComponents')
+const universe = bard('Elixir.BardDemo.UniversalComponents')
 
-const web = Bard({socket, module: 'Elixir.BardDemo.WebComponents', components})
-const portable = Bard({socket, module: 'Elixir.BardDemo.PortableComponents', components})
-
-export const Hello = portable('Hello')
+export const Hello = universe('Hello')
 
 const App = _ => <Hello />
 

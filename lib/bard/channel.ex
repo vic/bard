@@ -1,37 +1,25 @@
 defmodule Bard.Channel do
   use Phoenix.Channel
 
-  def join("bard:app:" <> _app, %{"module" => module}, socket) do
-    module = String.to_existing_atom(module)
-    {:ok, assign(socket, :bard_module, module)}
+  def join("bard:client", payload, socket) do
+    {:ok, assign(socket, :bard_client, payload)}
   end
 
-  def handle_in("bard:start:" <> id, payload, socket) do
+  def handle_in("bard:render", payload, socket) do
+    %{"module" => module, "component" => component} = payload
+    %{"props" => props}  = payload
+
+    component = "#{module}.#{component}" |> String.to_existing_atom
+
     bard = %{
-      id: id,
+      pid: self(),
       socket_ref: socket.ref,
       endpoint: socket.endpoint,
-      module: socket.assigns.bard_module,
+      client: socket.assigns.bard_client,
     }
 
-    Bard.Producer.start(bard, payload)
-
-    {:noreply, socket}
-  end
-
-  def handle_in("bard:stop:" <> id, _payload, socket) do
-    Bard.Producer.stop(%{id: id})
-    {:noreply, socket}
-  end
-
-  def handle_info({:send_next, bard, msg}, socket) do
-    push(socket, "bard:next:" <> bard.id, msg)
-    {:noreply, socket}
-  end
-
-  def handle_info({:send_complete, bard}, socket) do
-    push(socket, "bard:complete:" <> bard.id, %{})
-    {:noreply, socket}
+    rendered = Bard.Render.render({component, props}, bard)
+    {:reply, {:render, rendered}, socket}
   end
 
 end
