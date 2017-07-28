@@ -1,0 +1,36 @@
+{
+  "name": "bard-react",
+  "version": "0.0.1",
+  "description": "Bard",
+  "main": "_build/priv/bard.js",
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "dependencies": {
+    "phoenix": "^1.2.1",
+    "ramda": "^0.24.1",
+    "recompose": "^0.24.0",
+    "xstream": "^10.9.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "backend_deps": "cd example/BardBackend && mix deps.get",
+    "web_deps": "cd example/BardWeb && yarn install",
+    "deps": "npm run web_deps & npm run backend_deps",
+    "backend": "cd example/BardBackend && iex -S mix phoenix.server",
+    "ios": "cd example/BardNative && npm run ios",
+    "start": "npm run deps && npm run backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vic/bard.git"
+  },
+  "author": "Victor Borja <vborja@apache.org>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/vic/bard/issues"
+  },
+  "homepage": "https://github.com/vic/bard#readme"
+}

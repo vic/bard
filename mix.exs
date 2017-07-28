@@ -12,6 +12,7 @@ defmodule Bard.Mixfile do
      package: package(),
      source_url: "https://github.com/vic/bard",
      docs: [source_ref: "v#{@version}", main: "Bard"],
+     aliases: aliases(),
      deps: deps()]
   end
 
@@ -50,4 +51,9 @@ defmodule Bard.Mixfile do
       {:phoenix, "~> 1.2"}
     ]
   end
+
+  def aliases do
+    []
+  end
+
 end
