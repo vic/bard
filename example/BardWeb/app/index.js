@@ -17,16 +17,16 @@ const adapted = {
 }
 
 const components = {
-  'Elixir.BradDemo.SemanticComponents': Semantic,
-  'Elixir.BradDemo.PortableComponents': name => adapted[name] || portable(name),
-  'Elixir.BradDemo.WebComponents': name => web(name)
+  'Elixir.BardDemo.SemanticComponents': Semantic,
+  'Elixir.BardDemo.PortableComponents': name => adapted[name] || portable(name),
+  'Elixir.BardDemo.WebComponents': name => web(name)
 }
 
 const WS_URI = 'ws://localhost:4000/socket'
 const socket = new Socket(WS_URI)
 
-const web = Bard({socket, module: 'Elixir.BradDemo.WebComponents', components})
-const portable = Bard({socket, module: 'Elixir.BradDemo.PortableComponents', components})
+const web = Bard({socket, module: 'Elixir.BardDemo.WebComponents', components})
+const portable = Bard({socket, module: 'Elixir.BardDemo.PortableComponents', components})
 
 export const Hello = portable('Hello')
 

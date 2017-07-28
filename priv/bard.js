@@ -65,8 +65,10 @@ const Bard = ({module, components, uri, socket: existingSocket}) => {
   const socket = existingSocket || new Socket(uri, {logger})
   socket.isConnected() || socket.connect()
 
-  const channel = socket.channel('bard:app', {module})
-  channel.join()
+  const topic = 'bard:app:'+module
+  const sameTopic = R.find(ch => ch.topic === topic)
+  const channel = sameTopic(socket.channels) || socket.channel(topic, {module})
+  channel.joinedOnce ||  channel.join()
 
   const bardEncodeParams = (value, name) => {
     console.log('encoded', name, value)

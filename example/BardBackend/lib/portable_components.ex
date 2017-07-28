@@ -1,4 +1,4 @@
-defmodule BradDemo.PortableComponents do
+defmodule BardDemo.PortableComponents do
 
   use Bard.Components
   use Bard.Render
@@ -8,6 +8,7 @@ defmodule BradDemo.PortableComponents do
 
   def component({Hello, props}, bard) do
     who = Map.get(props, "world", "from Bard")
+
     r(Title) do
       r(Text, "Hello #{who}!")
     end

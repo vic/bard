@@ -1,2 +1,2 @@
-defmodule BradDemo.WebComponents do
+defmodule BardDemo.WebComponents do
 end

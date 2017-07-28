@@ -1,7 +1,7 @@
 defmodule Bard.Channel do
   use Phoenix.Channel
 
-  def join("bard:app", %{"module" => module}, socket) do
+  def join("bard:app:" <> _app, %{"module" => module}, socket) do
     module = String.to_existing_atom(module)
     {:ok, assign(socket, :bard_module, module)}
   end
