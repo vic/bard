@@ -1,15 +1,23 @@
 import {Socket} from 'phoenix'
+
 import React from 'react'
-import Semantic from 'semantic-ui-react'
+import * as Semantic from 'semantic-ui-react'
 import Bard from 'bard'
 
+import {
+  withProps
+} from 'recompose'
+
 const Text = 'span'
+const Title = withProps({size: 'huge'})(Semantic.Header)
 
 const adapted = {
-  Text
+  Text,
+  Title,
 }
 
 const components = {
+  'Elixir.BradDemo.SemanticComponents': Semantic,
   'Elixir.BradDemo.PortableComponents': name => adapted[name] || portable(name),
   'Elixir.BradDemo.WebComponents': name => web(name)
 }
