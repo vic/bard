@@ -10,6 +10,7 @@ const universal = {
   Text: 'span',
   View: 'div',
   Title: withProps({size: 'huge'})(Semantic.Header),
+  Button: Semantic.Button,
 }
 
 const components = {
@@ -22,8 +23,17 @@ const bard = Bard({app: 'demo', components, uri: 'ws://localhost:4000/socket'})
 const web = bard('Elixir.BardDemo.WebComponents')
 const universe = bard('Elixir.BardDemo.UniversalComponents')
 
-export const Hello = universe('Hello')
+const Hello = universe('Hello')
+const ClickHere = universe('ClickHere')
 
-const App = _ => <Hello />
+
+const clicked = ev => alert("Clicked")
+
+const App = _ => (
+  <div>
+    <Hello />
+    <ClickHere />
+  </div>
+)
 
 export default App

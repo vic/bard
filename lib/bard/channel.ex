@@ -11,15 +11,19 @@ defmodule Bard.Channel do
 
     component = "#{module}.#{component}" |> String.to_existing_atom
 
-    bard = %{
+    hash = :erlang.phash2({payload, socket})
+    bard = %Bard{
+      hash: hash,
       pid: self(),
-      socket_ref: socket.ref,
+      socket_ref: socket_ref(socket),
       endpoint: socket.endpoint,
-      client: socket.assigns.bard_client,
+      component: component
     }
 
     rendered = Bard.Render.render({component, props}, bard)
-    {:reply, {:render, rendered}, socket}
+    Bard.reply(bard, :render, rendered)
+
+    {:noreply, socket}
   end
 
 end

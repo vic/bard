@@ -1,18 +1,27 @@
 defmodule Bard do
-  @moduledoc """
-  Documentation for Bard.
-  """
+  defstruct [:pid, :hash, :socket_ref, :endpoint, :component]
 
-  @doc """
-  Hello world.
+  def on(bard, fun, opts \\ []) when is_function(fun, 2) do
+    hash = :erlang.phash2({bard, fun, opts})
+    id = to_string(hash)
+    reply(bard, :def, %{fun: id})
+    %{fun: id}
+  end
 
-  ## Examples
+  def log(bard, msg) do
+    reply(bard, :log, %{component: bard.component, msg: msg})
+  end
 
-      iex> Bard.hello
-      :world
+  def eval(bard, js) do
+    reply(bard, :eval, %{js: js})
+  end
 
-  """
-  def hello do
-    :world
+  def topic(bard) do
+    "bard:component:#{bard.component}:#{bard.hash}"
+  end
+
+  def reply(bard, event, payload) do
+    Phoenix.Channel.reply(bard.socket_ref, {:reply, %{event => payload}})
+    bard
   end
 end
