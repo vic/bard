@@ -1,3 +1,39 @@
+defmodule Bard.Render.R do
+
+  defmacro r(tag) do
+    {tag, []}
+  end
+
+  defmacro r(tag, props) when is_list(props) do
+    {tag, kw_props(props)}
+  end
+
+  defmacro r(tag, child) do
+    {tag, kw_props(do: child)}
+  end
+
+  defp kw_props(props) do
+    props
+    |> Enum.map(fn
+      {:do, {:__block__, _, children}} ->
+        quote do
+          unquote(children) |> unquote(__MODULE__).children
+        end
+      {:do, child} -> {:children, [child]}
+      {k, v} -> {k, v}
+    end)
+  end
+
+  def children(children) do
+    childs = children |> Enum.filter(fn
+      {k, kw} when is_list(kw) -> true
+      _ -> false
+    end)
+    {:children, childs}
+  end
+
+end
+
 defmodule Bard.Render do
   defmacro __using__(_) do
     quote do
