@@ -29,6 +29,10 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
+# Yes, this is inteded only for development, this is a demo.
+port = (System.get_env["PORT"] || "4000") |> String.to_integer
+host = (System.get_env["NOW_URL"] || "localhost")
+
 config :bard_backend, BardBackend.Endpoint,
   debug_errors: true,
   code_reloader: true,
@@ -36,8 +40,8 @@ config :bard_backend, BardBackend.Endpoint,
   render_errors: [view: BardBackend.ErrorView, accepts: ~w[json]],
   pubsub: [name: BardBackend.PubSub,
            adapter: Phoenix.PubSub.PG2],
-  http: [port: 4000],
-  url: [host: "localhost", port: 4000],
+  http: [port: port],
+  url: [host: host, port: port],
   secret_key_base: "ITDofrt09K04kIyp7F5FJVHRTLuPjiRDlt0U1owtIzz2K93K1YiUM0EfyGjQzhFL",
   watchers: [npm: ["start",
                     cd: Path.expand("../../BardWeb", __DIR__)]]
