@@ -21,6 +21,7 @@ defmodule Bard do
   end
 
   def reply(bard, event, payload) do
+    IO.inspect({:BARD_REPLY, event, payload})
     Phoenix.Channel.reply(bard.socket_ref, {event, payload})
     bard
   end

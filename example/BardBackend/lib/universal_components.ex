@@ -9,7 +9,7 @@ defmodule BardDemo.UniversalComponents do
     def render(_props, _bard), do: hello("Bard")
 
     defp hello(to) do
-      r(Title, children: r(Text, children: "Hello #{to}!"))
+      r(Title, do: r(Text, do: "Hello #{to}!"))
     end
   end
 

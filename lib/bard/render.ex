@@ -44,37 +44,41 @@ defmodule Bard.Render do
 
   The rendered tree is deep-first walked.
   """
-  def render({component, props}, bard) do
-    component.render(props, bard) |> normalize(bard)
+  def render(module_and_props, bard)
+  def render(cmp, bard), do: render(cmp, bard, &(&1))
+
+  @doc false
+  def render({component, props}, bard, into) do
+    component.render(props, bard) |> normalize(bard, into)
   end
 
-
-  defp normalize({component, props}, bard) when is_list(props) do
+  defp normalize({component, props}, bard, into) when is_list(props) do
     if is_tag(component) do
-      {component, normalize_children(props, bard) |> normalize_props(bard)}
-      |> expand(bard)
+      {component, normalize_children(props, bard, into) |> normalize_props(bard, into)}
+      |> expand(bard, into)
+      |> into.()
     else
-      {to_string(component), normalize(props, bard)}
+      {to_string(component), normalize(props, bard, into)}
     end
   end
 
-  defp normalize(lst, bard) when is_list(lst) do
-    Enum.map(lst, &normalize(&1, bard))
+  defp normalize(lst, bard, into) when is_list(lst) do
+    Enum.map(lst, &normalize(&1, bard, into))
   end
 
-  defp normalize(x, _bard), do: x
+  defp normalize(x, _bard, _into), do: x
 
-  defp normalize_children(props, bard) when is_list(props) do
+  defp normalize_children(props, bard, into) when is_list(props) do
     update_in(props, [:children], fn
       nil -> []
-      children -> Enum.map(children, &normalize(&1, bard))
+      children -> Enum.map(children, &normalize(&1, bard, into))
     end)
   end
 
-  defp normalize_props(props, bard) when is_list(props) do
+  defp normalize_props(props, bard, into) when is_list(props) do
     Enum.map(props, fn
       {:children, children} -> {"children", children}
-      {k, v} when is_atom(k) -> {to_string(k), normalize(v, bard)}
+      {k, v} when is_atom(k) -> {to_string(k), normalize(v, bard, into)}
     end)
     |> Enum.into(%{})
   end
@@ -84,12 +88,17 @@ defmodule Bard.Render do
   end
   defp is_tag(_), do: false
 
-  defp expand({component, props}, bard) when is_atom(component) do
+  defp expand({component, props}, bard, into) when is_atom(component) do
     if function_exported?(component, :render, 2) do
-      render({component, props}, bard)
+      render({component, props}, bard, into)
     else
       {component, props}
     end
+  end
+
+  @doc false
+  def into_map({component, props}) do
+    %{"component" => component, "props" => props}
   end
 
 end

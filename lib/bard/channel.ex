@@ -23,7 +23,7 @@ defmodule Bard.Channel do
       component: component
     }
 
-    rendered = Bard.Render.render({component, props}, bard)
+    rendered = Bard.Render.render({component, props}, bard, &Bard.Render.into_map/1)
     Bard.reply(bard, :render, rendered)
 
     {:noreply, socket}
