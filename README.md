@@ -1,6 +1,11 @@
 # Bard
 
-![bard-horse](https://user-images.githubusercontent.com/331/28672144-8563135e-72a4-11e7-9561-5757b67d4cd6.png)
+[![Travis](https://img.shields.io/travis/vic/bard.svg)](https://travis-ci.org/vic/bard)
+[![Hex.pm](https://img.shields.io/hexpm/v/bard.svg)](https://hexdocs.pm/bard)
+
+<p>
+<image src="https://user-images.githubusercontent.com/331/28672144-8563135e-72a4-11e7-9561-5757b67d4cd6.png" height="300"/>
+</p>
 
 ## Installation
 
