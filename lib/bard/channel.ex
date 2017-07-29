@@ -1,4 +1,7 @@
 defmodule Bard.Channel do
+
+  @moduledoc false
+
   use Phoenix.Channel
 
   def join("bard:client", payload, socket) do
