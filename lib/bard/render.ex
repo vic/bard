@@ -1,7 +1,7 @@
 defmodule Bard.Render do
 
   @moduledoc """
-  This module helps converting a node tuple
+  This module helps converting a tuple
   like
 
      {Button, [primary: true, children: ["Hola"]]}
@@ -38,17 +38,51 @@ defmodule Bard.Render do
   The rendered tree is deep-first walked.
   """
   def render({component, props}, bard) do
-    ast = component.render(props, bard)
-    expanded_ast = render_deep_first(ast, bard)
-    if ast == expanded_ast do
-      expanded_ast
+    component.render(props, bard) |> normalize(bard)
+  end
+
+
+  defp normalize({component, props}, bard) when is_list(props) do
+    if is_tag(component) do
+      {component, normalize_children(props, bard) |> normalize_props(bard)}
+      |> expand(bard)
     else
-      render(expanded_ast, bard)
+      {to_string(component), normalize(props, bard)}
     end
   end
 
-  defp render_deep_first({comp, props}, bard) do
+  defp normalize(lst, bard) when is_list(lst) do
+    Enum.map(lst, &normalize(&1, bard))
+  end
 
+  defp normalize(x, _bard), do: x
+
+  defp normalize_children(props, bard) when is_list(props) do
+    update_in(props, [:children], fn
+      nil -> []
+      children -> Enum.map(children, &normalize(&1, bard))
+    end)
+  end
+
+  defp normalize_props(props, bard) when is_list(props) do
+    Enum.map(props, fn
+      {:children, children} -> {"children", children}
+      {k, v} when is_atom(k) -> {to_string(k), normalize(v, bard)}
+    end)
+    |> Enum.into(%{})
+  end
+
+  defp is_tag(component) when is_atom(component) do
+    to_string(component) == Macro.camelize(to_string(component))
+  end
+  defp is_tag(_), do: false
+
+  defp expand({component, props}, bard) when is_atom(component) do
+    if function_exported?(component, :render, 2) do
+      render({component, props}, bard)
+    else
+      {component, props}
+    end
   end
 
 end
