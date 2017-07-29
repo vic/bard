@@ -15,21 +15,11 @@ defmodule Bard.Render.R do
   defp kw_props(props) do
     props
     |> Enum.map(fn
-      {:do, {:__block__, _, children}} ->
-        quote do
-          unquote(children) |> unquote(__MODULE__).children
-        end
+      {:do, {:__block__, _, children}} -> {:children, children}
       {:do, child} -> {:children, [child]}
       {k, v} -> {k, v}
+      a when is_atom(a) -> {a, true}
     end)
-  end
-
-  def children(children) do
-    childs = children |> Enum.filter(fn
-      {k, kw} when is_list(kw) -> true
-      _ -> false
-    end)
-    {:children, childs}
   end
 
 end

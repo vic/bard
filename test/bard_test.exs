@@ -11,8 +11,13 @@ defmodule BardTest do
     end
 
     test "a tag with keyword properties" do
-      assert {Button, [primary: true, theme: "dark"]} ==
-        r(Button, primary: true, theme: "dark")
+      assert {Button, [theme: "dark"]} ==
+        r(Button, theme: "dark")
+    end
+
+    test "a tag with atom property set to true" do
+      assert {Button, [primary: true]} ==
+        r(Button, [:primary])
     end
 
     test "a tag with child as argument" do
@@ -34,14 +39,14 @@ defmodule BardTest do
       {Div, [children: [{Input, []}, {Button, []}]]}
     end
 
-    test "a tag skips non tag childs" do
+    test "a tag child can be any term" do
       assert (
         r(Div) do
           r(Input)
-          "skipped"
+          "foo"
           r(Button)
         end) ==
-      {Div, [children: [{Input, []}, {Button, []}]]}
+      {Div, [children: [{Input, []}, "foo", {Button, []}]]}
     end
 
   end
