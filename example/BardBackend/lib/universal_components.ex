@@ -15,13 +15,10 @@ defmodule BardDemo.UniversalComponents do
 
   defmodule ClickHere do
     def render(props, bard) do
-      Bard.eval(bard, "alert('bitch')")
-      Bard.eval(bard, "console.log('FUCK ONE BITCH')")
-      Bard.eval(bard, "console.log('FUCK TWO BITCH')")
-      Bard.eval(bard, "console.log('FUCK TREE BITCH')")
       r(Button,
-        # onClick: Bard.on(bard, &pressed/2),
-        children: ["DONT CLICK HERE"])
+        onClick: Bard.on(bard, &pressed/2)) do
+        "Please click here"
+      end
     end
 
     def pressed(payload, bard) do

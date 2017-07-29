@@ -1,9 +1,9 @@
-function evaluator(code) { eval.bind(null)(code) }
-
 import React from 'react'
 import R from 'ramda'
 import xs from 'xstream'
 import {Socket} from 'phoenix'
+
+import evaluator from './evaluator'
 
 import {
   compose,
@@ -48,16 +48,12 @@ const Bard = ({app, conf, uri, socket: existingSocket, components}) => {
 
   const push = R.curry((event, payload) => {
     let pushed
-    const stop = _ => pushed.reset()
+    const stop = _ => pushed = null
     const start = listener => {
       pushed = channel.push(event, payload)
-        .receive('timeout', e => listener.error(e))
-        .receive('error', e => listener.error(e))
-      const nextReply = ({status, response}) => {
-        console.log("GOT EVENT REPLY ")
-        status === 'reply' && listener.next(response)
-      }
-      channel.on(pushed.refEvent, nextReply)
+      channel.on('phx_reply', (payload, ref) => {
+        pushed && (ref === pushed.ref) && listener.next(payload)
+      })
     }
     return xs.create({start, stop})
   })
@@ -75,11 +71,11 @@ const Bard = ({app, conf, uri, socket: existingSocket, components}) => {
   const build = ({module, component, props}, props$) => {
     const funs = {}
 
-    const defun = ({fun}) => funs[fun] = (...args) => {
+    const defFun = ({fun}) => funs[fun] = (...args) => {
       console.log("REMOVE INVOKE ", fun, args)
     }
 
-    const mkFun = (fun, name) => {
+    const saveFun = (fun, name) => {
       const id = `${name}:${UUID()}`
       funs[id] = fun
       return ({fun: id})
@@ -88,12 +84,13 @@ const Bard = ({app, conf, uri, socket: existingSocket, components}) => {
     const encode = (value, name) => {
       if (Array.isArray(value)) return R.map(encode, value)
       if (typeof value === 'object') return R.mapObjIndexed(encode, value)
-      if (typeof value === 'function') { return mkFun(value, name) }
+      if (typeof value === 'function') { return saveFun(value, name) }
       return value
     }
 
     const render = value => {
       if (Array.isArray(value)) return R.map(render, value)
+      if (typeof value === 'object' && value.fun) { return funs[value.fun] }
       if (typeof value === 'object' && value.component) {
         const propValues = R.mapObjIndexed(render)(value.props)
         const enhance = compose(withProps(propValues))
@@ -102,15 +99,16 @@ const Bard = ({app, conf, uri, socket: existingSocket, components}) => {
       return value
     }
 
-    const param$ = props$.map(encode).map(props => ({module, component, props}))
-    const reply$ = param$.map(push('bard:render')).flatten()
-    const onReply = subject => reply$.compose(filterMap(R.prop(subject)))
+    const req$ = props$.map(encode).map(props => ({module, component, props}))
+    const res$ = req$.map(push('bard:render')).flatten()
 
-    const render$ = onReply('render').debug('WILL RENDER').map(render).debug('RENDERED')
+    const onReply = status => res$.filter(x => x.status === status).map(x => x.response)
 
-    onReply('eval').map(evaluator).compose(sink)
-    onReply('log').map(console.log.bind(console)).compose(sink)
-    onReply('def').map(defun).compose(sink)
+    const render$ = onReply('render').map(render)
+
+    onReply('eval').map(R.prop('js')).map(evaluator).compose(sink)
+    onReply('log').map(console.log.bind(console, component)).compose(sink)
+    onReply('def').map(defFun).compose(sink)
 
     return render$
   }

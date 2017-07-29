@@ -21,7 +21,7 @@ defmodule Bard do
   end
 
   def reply(bard, event, payload) do
-    Phoenix.Channel.reply(bard.socket_ref, {:reply, %{event => payload}})
+    Phoenix.Channel.reply(bard.socket_ref, {event, payload})
     bard
   end
 end
