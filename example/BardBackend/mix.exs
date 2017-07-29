@@ -34,7 +34,8 @@ defmodule BardBackend.Mixfile do
       {:cowboy, "~> 1.0"},
       {:phoenix, "~> 1.2"},
       {:phoenix_pubsub, "~> 1.0"},
-      {:bard, path: Path.join(__DIR__, "../../") }
+      {:bard, path: Path.join(__DIR__, "../../") },
+      {:reverse_proxy, "~> 0.3"}
     ]
   end
 end
