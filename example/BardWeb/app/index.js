@@ -19,7 +19,7 @@ const components = {
   'Elixir.BardDemo.WebComponents': name => web(name)
 }
 
-const bard = Bard({app: 'demo', components, uri: 'ws://localhost:4000/socket'})
+const bard = Bard({app: 'demo', components, uri: `ws://${window.location.host}/socket`})
 const web = bard('Elixir.BardDemo.WebComponents')
 const universe = bard('Elixir.BardDemo.UniversalComponents')
 
