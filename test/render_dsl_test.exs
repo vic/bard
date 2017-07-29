@@ -1,10 +1,10 @@
-defmodule BardTest do
+defmodule Bard.Render.DSLTest do
   use ExUnit.Case
 
+  use Bard.Render.DSL
+  doctest Bard.Render.DSL
 
   describe "Tag DSL reader" do
-    use Bard.Render.DSL
-    doctest Bard.Render.DSL
 
     test "given tag but no props nor children" do
       assert {Div, []} == r(Div)
@@ -48,7 +48,6 @@ defmodule BardTest do
         end) ==
       {Div, [children: [{Input, []}, "foo", {Button, []}]]}
     end
-
 
   end
 

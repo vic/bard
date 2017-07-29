@@ -1,176 +1,54 @@
-defmodule Bard.Render.DSL do
+defmodule Bard.Render do
 
   @moduledoc """
-  A tiny DSL for reading nodes from Elixir syntax.
+  This module helps converting a node tuple
+  like
 
-  In Bard nodes are represented by the
-  Elixir tuple:
+     {Button, [primary: true, children: ["Hola"]]}
 
-     {Tag, properties}
-
-  Where Tag is an atom and properties is a list,
-  most likely a keyword.
-
-  The `r` macro is provided as a convenience,
-  for example:
-
-     iex> use Bard.Render.DSL
-     iex> r(Button, "Hello")
-     {Button, children: ["Hello"]}
-
-     iex> use Bard.Render.DSL
-     iex> r(Button, [:primary]) do
-     ...>   "Hola"
-     ...> end
-     {Button, primary: true, children: ["Hola"]}
-
+  into a representation suitable to be sent
+  to the client side Bard library.
   """
 
-  @doc false
-  defmacro __using__(_) do
-    quote do
-      import Bard.Render.DSL
-    end
-  end
+  @doc """
+  Renders a component with props.
 
-  @doc "Create an empty tag"
-  defmacro r(tag) do
-    {tag, []}
-  end
+  Invokes the component's module with the given
+  props and with a brad.
 
-  @doc "Create a tag with props"
-  defmacro r(tag, props)
+  The props received by the `render/2` function
+  are Maps instead of Keywords as produced by
+  Bard.Render.DSL. That's because the client
+  side Bard library will send a javascript props
+  object, and many of its keys may not exist as
+  atoms on the erlang node. Thus we avoid enforcing
+  the usage of Keyword, and prefer instead to use
+  maps with string keys.
 
-  defmacro r(tag, props) when is_list(props) do
-    {tag, kw_props(props)}
-  end
+  Because of this, when the module's `render/2`
+  function returns, its properties are converted
+  into a map of string keys to keep with the
+  initial form, even if you used the DSL to create
+  the rendered tree.
 
-  defmacro r(tag, child) do
-    {tag, kw_props(do: child)}
-  end
+  Just like on macro expansion, the result is
+  automatically recursed until no more possible
+  renderable components can be found.
 
-  @doc "Create a tag with props and children"
-  defmacro r(tag, props, children)
-
-  defmacro r(tag, props, children) do
-    {tag, kw_props(props) ++ [children(children)]}
-  end
-
-  defp children([{:do, {:__block__, _, children}}]) do
-    {:children, children}
-  end
-  defp children([{:do, child}]) do
-    {:children, [child]}
-  end
-  defp children(children) when is_list(children) do
-    {:children, children}
-  end
-  defp children(child) do
-    {:children, [child]}
-  end
-
-  defp kw_props(props) do
-    props
-    |> Enum.map(fn
-      {:do, children} -> children([do: children])
-      a when is_atom(a) -> {a, true}
-      x -> x
-    end)
-  end
-
-end
-
-defmodule Bard.Render2 do
-  defmacro __using__(_) do
-    quote do
-      import Bard.Render.DSL
-    end
-  end
-
-  def render({module, props}, bard) do
-    props |> module.render(bard) |> encode(bard)
-  end
-
-  defp encode({tag, props}, bard) when is_atom(tag) and is_map(props) do
-    %{"component" => tag, "props" => encode(props, bard)}
-  end
-
-  defp encode(map, bard) when is_map(map) do
-    Enum.map(map, fn {k, v} -> {encode(k, bard), encode(v, bard)} end) |> Enum.into(%{})
-  end
-
-  defp encode(list, bard) when is_list(list) do
-    Enum.map(list, &encode(&1, bard))
-  end
-
-  defp encode(value, bard), do: value
-
-end
-
-defmodule Bard.Render.Quoted do
-  def render_tag(tag, props, children) do
-    quote do
-      import Bard.Render.Quoted
-      {unquote(tag), with_children(kw_as_map(unquote(props)), unquote(children))}
-    end
-  end
-
-  def with_children(map, []) do
-    map
-  end
-
-  def with_children(map, children) do
-    Map.put(map, "children", children)
-  end
-
-  def as_list({:__block__, _, children}) do
-    children
-  end
-
-  def as_list(child) do
-    [child]
-  end
-
-  def kw_as_map(kw) when is_list(kw) or is_map(kw) do
-    if Keyword.keyword?(kw) or is_map(kw) do
-      Enum.map(kw, fn {k, v} -> {to_string(k), kw_as_map(v)} end) |> Enum.into(%{})
+  The rendered tree is deep-first walked.
+  """
+  def render({component, props}, bard) do
+    ast = component.render(props, bard)
+    expanded_ast = render_deep_first(ast, bard)
+    if ast == expanded_ast do
+      expanded_ast
     else
-      Enum.map(kw, &kw_as_map/1)
+      render(expanded_ast, bard)
     end
   end
 
-  def kw_as_map(x), do: x
-end
+  defp render_deep_first({comp, props}, bard) do
 
-defmodule Bard.Render2.DSL do
-  import Bard.Render.Quoted
+  end
 
-  defmacro r(tag, props, [do: children]) do
-    render_tag(tag, props, as_list(children))
-  end
-  defmacro r(tag, props, children) when is_list(children) do
-    render_tag(tag, props, children)
-  end
-  defmacro r(tag, props, child) do
-    render_tag(tag, props, [child])
-  end
-  defmacro r(tag, [do: children]) do
-    render_tag(tag, [], as_list(children))
-  end
-  defmacro r(tag, props = {:%{}, _, _}) do
-    render_tag(tag, props, [])
-  end
-  defmacro r(tag, props) when is_list(props) do
-    if Keyword.keyword?(props) do
-      render_tag(tag, props, [])
-    else
-      render_tag(tag, [], props)
-    end
-  end
-  defmacro r(tag, child) do
-    render_tag(tag, [], [child])
-  end
-  defmacro r(tag) do
-    render_tag(tag, [], [])
-  end
 end
