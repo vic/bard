@@ -10,13 +10,6 @@ defmodule Bard.Render do
   to the client side Bard library.
   """
 
-  @doc false
-  defmacro __using__(_) do
-    quote do
-      use Bard.Render.DSL
-    end
-  end
-
   @doc """
   Renders a component with props.
 

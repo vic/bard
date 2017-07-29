@@ -2,7 +2,7 @@ defmodule BardDemo.UniversalComponents do
 
   alias __MODULE__.{Hello, Text, Title, Button}
 
-  use Bard.Render
+  use Bard.DSL
 
   defmodule Hello do
     def render(%{"to" => to}, _bard), do: hello(to)
@@ -15,13 +15,12 @@ defmodule BardDemo.UniversalComponents do
 
   defmodule ClickHere do
     def render(props, bard) do
-      r(Button,
-        onClick: Bard.on(bard, &pressed/2)) do
+      r(Button, on(:press, do: pressed(bard))) do
         "Please click here"
       end
     end
 
-    def pressed(payload, bard) do
+    def pressed(bard) do
       IO.inspect("PRESSED")
       Bard.eval(bard, "alert('Please dont!')")
     end

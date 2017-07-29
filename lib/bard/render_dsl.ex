@@ -1,15 +1,15 @@
 defmodule Bard.Render.DSL do
 
   @moduledoc """
-  A tiny DSL for reading nodes from Elixir syntax.
+  A tiny DSL for rendering components with Elixir syntax.
 
   In Bard nodes are represented by the
   Elixir tuple:
 
      {Tag, properties}
 
-  Where Tag is an atom and properties is a list,
-  most likely a keyword.
+  Where Tag is an atom and properties is a map or
+  a keyword list.
 
   The `r` macro is provided as a convenience,
   for example:
