@@ -14,7 +14,7 @@ defmodule Bard.Render do
   Renders a component with props.
 
   Invokes the component's module with the given
-  props and with a brad.
+  props and with a bard struct.
 
   The props received by the `render/2` function
   are Maps instead of Keywords as produced by
@@ -35,7 +35,7 @@ defmodule Bard.Render do
   automatically recursed until no more possible
   renderable components can be found.
 
-  The rendered tree is deep-first walked.
+  The rendered tree is depth-first walked.
   """
   def render(module_and_props, bard)
   def render(cmp, bard), do: render(cmp, bard, &(&1))
