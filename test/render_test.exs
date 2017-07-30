@@ -2,7 +2,7 @@ defmodule Bard.RenderTest do
   use ExUnit.Case
 
   require Bard.TestComponents.World
-  alias Bard.TestComponents.{BatMan, Hello, Text, Div}
+  alias Bard.TestComponents.{BatMan, Hello, Text, Div, ClickHere}
 
   describe "param normalization" do
     test "converts into a map of sting keys" do
@@ -18,6 +18,14 @@ defmodule Bard.RenderTest do
                            {Text, %{"children" => ["World"]}}
                        ]}}
       assert expected == Bard.Render.render({Hello, %{}}, nil)
+    end
+  end
+
+  describe "handlers" do
+    test "get replaced by function" do
+      rendered = Bard.Render.render({ClickHere, %{}}, nil)
+      {_, %{"on" => [click: xfn]}} = rendered
+      assert is_function(xfn, 1)
     end
   end
 end

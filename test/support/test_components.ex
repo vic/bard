@@ -1,6 +1,6 @@
 defmodule Bard.TestComponents do
 
-  alias __MODULE__.{Hello, World, Text, Div}
+  alias __MODULE__.{Hello, World, Text, Div, Button}
 
   defmodule BatMan do
     def render(_props, _bard) do
@@ -28,6 +28,12 @@ defmodule Bard.TestComponents do
 
     def render(_, _bard) do
       {Text, children: ["Bard"]}
+    end
+  end
+
+  defmodule ClickHere do
+    def render(_, bard) do
+      {Button, [{:on, [click: fn x -> x end]}]}
     end
   end
 
