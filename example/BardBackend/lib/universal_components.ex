@@ -15,12 +15,12 @@ defmodule BardDemo.UniversalComponents do
 
   defmodule ClickHere do
     def render(props, bard) do
-      r(Button, on(:press, do: pressed(bard))) do
+      r(Button, on(press: pressed(bard))) do
         "Please click here"
       end
     end
 
-    def pressed(bard) do
+    def pressed(payload, bard) do
       IO.inspect("PRESSED")
       Bard.eval(bard, "alert('Please dont!')")
     end

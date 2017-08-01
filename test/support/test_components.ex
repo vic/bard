@@ -33,7 +33,7 @@ defmodule Bard.TestComponents do
 
   defmodule ClickHere do
     def render(_, bard) do
-      {Button, [{:on, [click: fn x -> x end]}]}
+      {Button, [on: [click: fn true -> :clicked end]]}
     end
   end
 

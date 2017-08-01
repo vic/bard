@@ -1,12 +1,17 @@
-FROM vborja/asdf-alpine:elixir-1.5.0-opt-20
+FROM vborja/asdf-alpine:elixir-1.5.0-nodejs-8.2.1
 
-ADD . /asdf/bard
+COPY . /asdf/bard
 WORKDIR /asdf/bard
 USER asdf
 
 EXPOSE 80
 ENV PORT 80
 
-RUN mix hex.local -f
+RUN chown -R asdf /asdf
 
+RUN npm install -g yarn
+RUN mix local.hex --force && mix local.rebar --force
+RUN mix deps.get
+RUN cd examples/BardBackend && mix deps.get
+RUN cd examples/BardWeb && yarn install
 CMD ["npm", "start"]

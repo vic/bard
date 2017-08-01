@@ -70,10 +70,19 @@ defmodule Bard.Render do
 
   defp normalize_props(props, bard, into) when is_list(props) do
     Enum.map(props, fn
+      {:on, handlers} -> {"on", def_handlers_ref(handlers, bard)}
       {:children, children} -> {"children", children}
       {k, v} when is_atom(k) -> {to_string(k), normalize(v, bard, into)}
     end)
     |> Enum.into(%{})
+  end
+
+  defp def_handlers_ref(handlers, bard) do
+    handlers
+    |> Enum.map(fn {event, handler} ->
+      ref = Bard.defun(bard, handler)
+      %{to_string(event) => %{"fun" => ref}}
+    end)
   end
 
   defp is_tag(component) when is_atom(component) do

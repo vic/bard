@@ -24,8 +24,8 @@ defmodule Bard.RenderTest do
   describe "handlers" do
     test "get replaced by function" do
       rendered = Bard.Render.render({ClickHere, %{}}, nil)
-      {_, %{"on" => [click: xfn]}} = rendered
-      assert is_function(xfn, 1)
+      {_, %{"on" => [click: [fun: fid]]}} = rendered
+      assert is_binary(fid)
     end
   end
 end

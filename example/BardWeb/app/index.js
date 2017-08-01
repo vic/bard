@@ -19,6 +19,11 @@ const components = {
   'Elixir.BardDemo.WebComponents': name => web(name)
 }
 
+const handlers = {
+  press: event => true,
+  textChanged: event => event.target.value
+}
+
 const bard = Bard({app: 'demo', components, uri: `ws://${window.location.host}/socket`})
 const web = bard('Elixir.BardDemo.WebComponents')
 const universe = bard('Elixir.BardDemo.UniversalComponents')

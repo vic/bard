@@ -1,11 +1,10 @@
 defmodule Bard do
   defstruct [:pid, :hash, :socket_ref, :endpoint, :component]
 
-  def on(bard, fun, opts \\ []) when is_function(fun, 2) do
-    hash = :erlang.phash2({bard, fun, opts})
-    id = to_string(hash)
+  def defun(bard, fun) when is_function(fun, 1) do
+    id = :erlang.phash2({bard, fun}) |> to_string
     reply(bard, :def, %{fun: id})
-    %{fun: id}
+    id
   end
 
   def log(bard, msg) do
@@ -25,4 +24,5 @@ defmodule Bard do
     Phoenix.Channel.reply(bard.socket_ref, {event, payload})
     bard
   end
+
 end
