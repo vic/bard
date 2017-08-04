@@ -48,6 +48,8 @@ defmodule Bard.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
+      {:stubr, "~> 1.5.1", only: :test},
+      {:expat, "~> 0.1.5", only: :test},
       {:ex_doc, "~> 0.14", only: :dev},
       {:phoenix, "~> 1.2"}
     ]

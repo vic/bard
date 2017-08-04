@@ -20,9 +20,12 @@ defmodule Bard do
   end
 
   def reply(bard, event, payload) do
-    IO.inspect({:BARD_REPLY, event, payload})
-    Phoenix.Channel.reply(bard.socket_ref, {event, payload})
+    phoenix_channel.reply(bard.socket_ref, {event, payload})
     bard
+  end
+
+  defp phoenix_channel do
+    Application.get_env(:bard, Phoenix.Channel)
   end
 
 end
