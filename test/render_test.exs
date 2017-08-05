@@ -9,7 +9,6 @@ defmodule Bard.RenderTest do
       reply: fn _ref, _data -> :ok end
     ], call_info: true)
 
-    Application.put_env(:bard, Phoenix.Channel, phx_ch_stub)
     context = Map.put(context, :phx_ch_stub, phx_ch_stub)
     {:ok, context}
   end
@@ -41,7 +40,7 @@ defmodule Bard.RenderTest do
                       "children" => children}}
 
     test "get replaced by function", %{phx_ch_stub: stub} do
-      bard = %{socket_ref: 1}
+      bard = %{socket_ref: 1, phx_channel: stub}
       assert button(fun: fun) = Bard.Render.render({ClickHere, %{}}, bard)
       assert Stubr.called_with?(stub, :reply, [bard.socket_ref, {:def, %{fun: fun}}])
     end

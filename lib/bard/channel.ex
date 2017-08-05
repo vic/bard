@@ -20,7 +20,8 @@ defmodule Bard.Channel do
       pid: self(),
       socket_ref: socket_ref(socket),
       endpoint: socket.endpoint,
-      component: component
+      component: component,
+      phx_channel: Phoenix.Channel
     }
 
     rendered = Bard.Render.render({component, props}, bard, &Bard.Render.into_map/1)
