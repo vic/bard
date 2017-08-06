@@ -11,6 +11,6 @@ matrix:
       env:
         - MIX_ENV=test
       before_script:
-        - mix deps.get && mix.deps.compile
+        - mix deps.get && mix deps.compile
       script:
         - mix compile | grep -A 1 'warning:' && exit 1 || true
