@@ -1,16 +1,15 @@
 language: elixir
+env:
+  - MIX_ENV=test
+before_script:
+  - mix deps.compile
+script:
+  - (mix compile | grep -A 1 'warning:') && fix_those_elixir_warnings || true
+  - mix test
+
 matrix:
   include:
     - elixir: 1.5.0
       otp_release: 20.0
     - elixir: 1.4.3
       otp_release: 19.3
-      
-    - elixir: 1.5.0
-      otp_release: 20.0
-      env:
-        - MIX_ENV=test
-      before_script:
-        - mix deps.compile
-      script:
-        - (mix compile | grep -A 1 'warning:') && fix_those_elixir_warnings || true
