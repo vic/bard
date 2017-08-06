@@ -4,7 +4,7 @@ env:
 before_script:
   - mix deps.compile
 script:
-  - if ! mix compile | grep -A 1 'warning:'; then fix_those_elixir_warnings; fi
+  - if mix compile | grep -A 1 'warning:'; then fix_those_elixir_warnings; fi
   - mix test
 
 matrix:
