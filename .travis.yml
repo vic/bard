@@ -13,4 +13,5 @@ matrix:
       before_script:
         - mix deps.get && mix deps.compile
       script:
-        - mix compile | grep -A 1 'warning:' && exit 1 || true
+        - mix compile | grep -A 1 'warning:' && fix_those_elixir_warnings
+        - true
