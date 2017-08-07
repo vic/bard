@@ -11,10 +11,6 @@ defmodule Bard do
     reply(bard, :log, %{component: bard.component, msg: msg})
   end
 
-  def eval(bard, js) do
-    reply(bard, :eval, %{js: js})
-  end
-
   def topic(bard) do
     "bard:component:#{bard.component}:#{bard.hash}"
   end
