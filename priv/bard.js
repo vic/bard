@@ -3,8 +3,6 @@ import R from 'ramda'
 import xs from 'xstream'
 import {Socket} from 'phoenix'
 
-import evaluator from './evaluator'
-
 import {
   compose,
   createEagerElement,
@@ -106,7 +104,6 @@ const Bard = ({app, conf, uri, socket: existingSocket, components}) => {
 
     const render$ = onReply('render').map(render)
 
-    onReply('eval').map(R.prop('js')).map(evaluator).compose(sink)
     onReply('log').map(console.log.bind(console, component)).compose(sink)
     onReply('def').map(defFun).compose(sink)
 
