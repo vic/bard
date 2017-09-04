@@ -26,7 +26,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
   ],
   resolve: {
     // root: path.resolve(__dirname, 'web/static/js'),
